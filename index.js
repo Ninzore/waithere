@@ -1,11 +1,15 @@
+import events from "events";
+
 export class QueueWorker {
     /** 
     * Provide queue function in Promise
     * @param {Number} maxBurst the max worker number
     */
-    constructor(maxBurst = 1) {
+    constructor(maxBurst = 1, delay = 0) {
         this.job_list = [];
         this.maxBurst = maxBurst;
+        this.delay = delay;
+        this.emitter = new events.EventEmitter();
     }
 
     /**
@@ -69,13 +73,12 @@ export class QueueWorker {
     * @return {Promise} resolve the final result,
     * reject on error
     */
-   async do(onFinish = (res, err) => {}, onError = (func, err) => {}) {
+   async do(onFinish = (res) => {}, onError = (func, err) => {}) {
         if (this.job_list.length <= 0) {
             return false;
         }
 
-        let res = null;
-        let err = null;
+        let worker_res = {nSuccess : 0, failed : []};
         let batch = [];
 
         try {
@@ -83,16 +86,32 @@ export class QueueWorker {
                 for (let i = 0; i < this.maxBurst && i < this.job_list.length; i++) {
                     let current = this.job_list[i];
                     batch.push(new Promise((resolve, reject) => {
-                        resolve(current.job(...current.args));
+                        try {
+                            resolve(current.job(...current.args));
+                        }
+                        catch(err) {
+                            reject(err);
+                        }
                     }));
+
+                    if (this.delay > 0) {
+                        await new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve();
+                            }, this.delay / this.maxBurst);
+                        });
+                    }
                 }
 
                 await Promise.allSettled(batch).then(res => {
                     for (let i = 0; i < batch.length; i++) {
                         if (res[i].status === "rejected") {
-                            if (typeof callback === "function") {
-                                callback(batch[i], res[i].reason);
+                            if (typeof onError === "function") {
+                                onError(batch[i], res[i].reason);
+                                worker_res.failed.push({function : batch[i], reason : res[i].reason});
                             }
+                        } else {
+                            worker_res.nSuccess ++;
                         }
                     }
                 });
@@ -106,11 +125,11 @@ export class QueueWorker {
         }
 
         if (typeof onFinish === "function") {
-            onFinish(res, err);
+            onFinish(worker_res);
         }
-    }
 
-    
+        this.emitter.emit("success", worker_res);
+    }
 
     /**
     * Remove the first job in the queue and return it
