@@ -73,12 +73,12 @@ export class QueueWorker {
     * @return {Promise} resolve the final result,
     * reject on error
     */
-   async do(onFinish = (res) => {}, onError = (func, err) => {}) {
+    async do(onFinish = (res) => {}, onError = (func, err) => {}) {
         if (this.job_list.length <= 0) {
             return false;
         }
 
-        let worker_res = {nSuccess : 0, failed : []};
+        let worker_res = {nSuccess : 0, successed: [], failed : []};
         let batch = [];
 
         try {
@@ -111,6 +111,7 @@ export class QueueWorker {
                                 worker_res.failed.push({function : batch[i], reason : res[i].reason});
                             }
                         } else {
+                            worker_res.successed.push({function : batch[i], value : res[i].value});
                             worker_res.nSuccess ++;
                         }
                     }
@@ -128,7 +129,8 @@ export class QueueWorker {
             onFinish(worker_res);
         }
 
-        this.emitter.emit("success", worker_res);
+        if (worker_res.failed.length > 0) this.emitter.emit("error", worker_res);
+        else this.emitter.emit("success", worker_res);
     }
 
     /**
