@@ -1,0 +1,23 @@
+{
+  "name": "workerqueue",
+  "version": "1.0.0",
+  "description": "a simple library provides asynchronize job queue",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ninzore/workerQueue.git"
+  },
+  "keywords": [
+    "queue",
+    "asynchronous"
+  ],
+  "author": "Ninzore",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ninzore/workerQueue/issues"
+  },
+  "homepage": "https://github.com/Ninzore/workerQueue#readme"
+}
