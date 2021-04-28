@@ -1,5 +1,5 @@
 {
-  "name": "workerqueue",
+  "name": "waithere",
   "version": "1.0.0",
   "description": "a simple library provides asynchronize job queue",
   "main": "index.js",
