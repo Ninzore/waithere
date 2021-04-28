@@ -1,4 +1,4 @@
-import {QueueWorker} from "./index";
+import {Waithere} from "./index";
 
 let test = function(word) {
     console.log(word)
@@ -17,7 +17,7 @@ let testPro = async function(word) {
 }
 
 async function start() {
-    let worker = new QueueWorker();
+    let worker = new Waithere();
     // worker.add(test, 123)
     // worker.add(testPro, 111)
     // worker.add(testPro, 222)

@@ -1,6 +1,6 @@
 import events from "events";
 
-export class QueueWorker {
+export class Waithere {
     /** 
     * Provide queue function in Promise
     * @param {Number} maxBurst the max worker number
