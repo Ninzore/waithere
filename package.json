@@ -1,6 +1,6 @@
 {
   "name": "waithere",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a simple library provides asynchronize job queue",
   "main": "index.js",
   "scripts": {
